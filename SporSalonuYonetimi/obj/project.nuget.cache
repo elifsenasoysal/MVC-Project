@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "hZNQDr2CTzI=",
+  "success": true,
+  "projectFilePath": "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/SporSalonuYonetimi.csproj",
+  "expectedPackageFiles": [
+    "/Users/elifsenasoysal/.nuget/packages/microsoft.entityframeworkcore.tools/10.0.0/microsoft.entityframeworkcore.tools.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
