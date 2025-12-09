@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/SporSalonuYonetimi.csproj": {}
+    "/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/SporSalonuYonetimi.csproj": {}
   },
   "projects": {
-    "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/SporSalonuYonetimi.csproj": {
+    "/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/SporSalonuYonetimi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/SporSalonuYonetimi.csproj",
+        "projectUniqueName": "/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/SporSalonuYonetimi.csproj",
         "projectName": "SporSalonuYonetimi",
-        "projectPath": "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/SporSalonuYonetimi.csproj",
+        "projectPath": "/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/SporSalonuYonetimi.csproj",
         "packagesPath": "/Users/elifsenasoysal/.nuget/packages/",
-        "outputPath": "/Users/elifsenasoysal/Desktop/SporSalonuYonetimi/obj/",
+        "outputPath": "/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/elifsenasoysal/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net8.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },
@@ -41,14 +41,34 @@
         "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
@@ -62,6 +82,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.20, 8.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[8.0.20, 8.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.20, 8.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
