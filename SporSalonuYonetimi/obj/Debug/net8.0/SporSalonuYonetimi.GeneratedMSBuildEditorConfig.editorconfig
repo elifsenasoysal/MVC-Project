@@ -96,6 +96,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/Trainers/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhaW5lcnMvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/Trainers/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhaW5lcnMvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/Trainers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhaW5lcnMvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/Trainers/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhaW5lcnMvRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/Trainers/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhaW5lcnMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/elifsenasoysal/Documents/GitHub/MVC-Project/SporSalonuYonetimi/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

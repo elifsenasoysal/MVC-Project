@@ -28,6 +28,16 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Giriş sayfasının doğru adresi:
+    options.LoginPath = "/Identity/Account/Login";
+    // Çıkış yapınca gidilecek yer:
+    options.LogoutPath = "/Identity/Account/Logout";
+    // Yetkisiz giriş denemesinde gidilecek yer:
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // Scaffolding sayfaları için gerekli
 
