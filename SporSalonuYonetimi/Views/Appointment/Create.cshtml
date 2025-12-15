@@ -1,0 +1,51 @@
+@model SporSalonuYonetimi.Models.Appointment
+
+@{
+    ViewData["Title"] = "Randevu Al";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4>📅 Randevu Oluştur</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="alert alert-info">
+                        Seçilen Hizmet: <strong>@ViewBag.ServiceName</strong> <br>
+                        Ücret: <strong>@ViewBag.Price ₺</strong>
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="ServiceId" value="@ViewBag.ServiceId" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Antrenör Seçiniz</label>
+                            <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.Trainers">
+                                <option value="">-- Lütfen bir eğitmen seçin --</option>
+                            </select>
+                            <span asp-validation-for="TrainerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Tarih ve Saat</label>
+                            <input asp-for="AppointmentDate" class="form-control" type="datetime-local" 
+                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Randevuyu Onayla</button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">İptal</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

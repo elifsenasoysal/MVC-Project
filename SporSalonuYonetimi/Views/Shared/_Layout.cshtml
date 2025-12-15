@@ -44,6 +44,13 @@
                                 </ul>
                             </li>
                         }
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Appointment"
+                                    asp-action="Index">Randevularım</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

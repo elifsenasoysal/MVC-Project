@@ -1,26 +1,39 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity; // Bunu eklemek zorundayız çünkü IdentityUser'ı kullanacağız
 
 namespace SporSalonuYonetimi.Models
 {
     public class Appointment
     {
+        [Key]
         public int AppointmentId { get; set; }
 
         [Required]
         [Display(Name = "Randevu Tarihi")]
-        public DateTime Date { get; set; }
+        public DateTime AppointmentDate { get; set; }
 
-        [Display(Name = "Onay Durumu")]
-        public bool IsConfirmed { get; set; } = false; // Varsayılan onaysız
+        [Display(Name = "Oluşturulma Tarihi")]
+        public DateTime CreatedDate { get; set; }
 
-        // İlişkiler (Foreign Keys)
+        // --- İŞTE KRİTİK NOKTA BURASI ---
+        
+        // IdentityUser'ın ID'si string olduğu için burayı string yapıyoruz
+        public string? UserId { get; set; } 
+
+        // Hazır gelen IdentityUser sınıfına bağlıyoruz
+        [ForeignKey("UserId")]
+        public virtual IdentityUser? User { get; set; }
+
+        // --------------------------------
+
+        // Diğer bağlantılar (Hizmet ve Antrenör)
         public int TrainerId { get; set; }
-        public Trainer Trainer { get; set; }
+        [ForeignKey("TrainerId")]
+        public virtual Trainer? Trainer { get; set; }
 
         public int ServiceId { get; set; }
-        public Service Service { get; set; }
-
-        // Randevuyu alan üyenin ID'si (Identity User ID string tutulur)
-        public string UserId { get; set; }
+        [ForeignKey("ServiceId")]
+        public virtual Service? Service { get; set; }
     }
 }

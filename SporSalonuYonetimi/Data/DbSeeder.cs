@@ -14,7 +14,8 @@ namespace SporSalonuYonetimi.Data
             await roleManager.CreateAsync(new IdentityRole("Member"));
 
             // Admin Ekle
-            var adminEmail = "g211210000@sakarya.edu.tr"; // Numaranı buraya yaz
+            var adminEmail = "b231210059@sakarya.edu.tr"; // Numaranı buraya yaz
+            var adminPassword = "sau"; // Şifre: sau
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
             if (adminUser == null)
@@ -26,7 +27,7 @@ namespace SporSalonuYonetimi.Data
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(newAdmin, "sau123!");
+                await userManager.CreateAsync(newAdmin, adminPassword);
                 await userManager.AddToRoleAsync(newAdmin, "Admin");
             }
         }

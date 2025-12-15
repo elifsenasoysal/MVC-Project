@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // BU EKSİK OLABİLİR
+using SporSalonuYonetimi.Data;       // BU EKSİK OLABİLİR
 using SporSalonuYonetimi.Models;
 
 namespace SporSalonuYonetimi.Controllers;
@@ -8,14 +10,23 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    // 1. Veritabanı Bağlantısını Tanımlıyoruz
+    private readonly ApplicationDbContext _context;
+
+    // 2. Constructor (Yapıcı Metot) içinde bağlantıyı alıyoruz
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
     {
         _logger = logger;
+        _context = context; // Bağlantıyı içeri aldık
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        // 3. Veritabanındaki Hizmetleri ÇEK ve Sayfaya Gönder
+        // Eğer burası boşsa veya sadece "return View();" varsa ekrana hiçbir şey gelmez.
+        var services = await _context.Services.ToListAsync();
+
+        return View(services);
     }
 
     public IActionResult Privacy()

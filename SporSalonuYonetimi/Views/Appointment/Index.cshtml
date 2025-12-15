@@ -1,0 +1,48 @@
+@model IEnumerable<SporSalonuYonetimi.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Randevularım";
+}
+
+<div class="container mt-5">
+    <h2 class="text-primary mb-4">📅 Randevularım</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            Henüz hiç randevunuz bulunmamaktadır. <a asp-controller="Home" asp-action="Index">Hemen Randevu Al!</a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tarih & Saat</th>
+                            <th>Hizmet</th>
+                            <th>Antrenör</th>
+                            <th>Ücret</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@item.Service?.ServiceName</td>
+                                <td>@item.Trainer?.FullName</td>
+                                <td>@item.Service?.Price ₺</td>
+                                <td>
+                                    <span class="badge bg-success">Aktif</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
