@@ -24,7 +24,8 @@ namespace SporSalonuYonetimi.Controllers
         // GET: Trainers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Trainers.ToListAsync());
+            // DEĞİŞİKLİK: Antrenörleri getirirken verdikleri hizmetleri de (Services) yanına ekle
+            return View(await _context.Trainers.Include(t => t.Services).ToListAsync());
         }
 
         // GET: Trainers/Details/5
@@ -36,6 +37,7 @@ namespace SporSalonuYonetimi.Controllers
             }
 
             var trainer = await _context.Trainers
+                .Include(t => t.Services) // DEĞİŞİKLİK: Detay sayfasında hizmetleri de görelim
                 .FirstOrDefaultAsync(m => m.TrainerId == id);
             if (trainer == null)
             {
@@ -48,22 +50,42 @@ namespace SporSalonuYonetimi.Controllers
         // GET: Trainers/Create
         public IActionResult Create()
         {
+            // DEĞİŞİKLİK: Checkbox listesi için tüm hizmetleri View'a gönderiyoruz
+            ViewBag.Services = _context.Services.ToList();
             return View();
         }
 
         // POST: Trainers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization")] Trainer trainer)
+        // DEĞİŞİKLİK: int[] selectedServices parametresi eklendi
+        public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization")] Trainer trainer, int[] selectedServices)
         {
+            // Gelen Hizmet ID'lerini antrenöre ekle
+            if (selectedServices != null)
+            {
+                foreach (var id in selectedServices)
+                {
+                    var service = await _context.Services.FindAsync(id);
+                    if (service != null)
+                    {
+                        trainer.Services.Add(service);
+                    }
+                }
+            }
+
+            // Services validasyon hatasını temizle (Zorunlu değilse)
+            ModelState.Remove("Services");
+
             if (ModelState.IsValid)
             {
                 _context.Add(trainer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            
+            // Hata varsa listeyi tekrar yükle
+            ViewBag.Services = _context.Services.ToList();
             return View(trainer);
         }
 
@@ -75,31 +97,65 @@ namespace SporSalonuYonetimi.Controllers
                 return NotFound();
             }
 
-            var trainer = await _context.Trainers.FindAsync(id);
+            // DEĞİŞİKLİK: Mevcut hizmetleriyle beraber getiriyoruz
+            var trainer = await _context.Trainers
+                                        .Include(t => t.Services)
+                                        .FirstOrDefaultAsync(t => t.TrainerId == id);
             if (trainer == null)
             {
                 return NotFound();
             }
+
+            // Tüm hizmetleri View'a gönder (Checkboxlar için)
+            ViewBag.Services = _context.Services.ToList();
             return View(trainer);
         }
 
         // POST: Trainers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization")] Trainer trainer)
+        // DEĞİŞİKLİK: Güncelleme mantığı değişti
+        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization")] Trainer trainer, int[] selectedServices)
         {
             if (id != trainer.TrainerId)
             {
                 return NotFound();
             }
 
+            ModelState.Remove("Services");
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(trainer);
+                    // 1. Veritabanındaki asıl antrenörü ilişkileriyle beraber çek
+                    var trainerToUpdate = await _context.Trainers
+                        .Include(t => t.Services)
+                        .FirstOrDefaultAsync(t => t.TrainerId == id);
+
+                    if (trainerToUpdate == null) return NotFound();
+
+                    // 2. Bilgileri güncelle
+                    trainerToUpdate.FullName = trainer.FullName;
+                    trainerToUpdate.Specialization = trainer.Specialization;
+
+                    // 3. İlişkileri Güncelle (Eskileri sil, yenileri ekle)
+                    trainerToUpdate.Services.Clear(); // Önceki dersleri temizle
+                    
+                    if (selectedServices != null)
+                    {
+                        foreach (var serviceId in selectedServices)
+                        {
+                            var service = await _context.Services.FindAsync(serviceId);
+                            if (service != null)
+                            {
+                                trainerToUpdate.Services.Add(service);
+                            }
+                        }
+                    }
+
+                    // 4. Kaydet
+                    _context.Update(trainerToUpdate);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -115,6 +171,8 @@ namespace SporSalonuYonetimi.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Services = _context.Services.ToList();
             return View(trainer);
         }
 
@@ -127,6 +185,7 @@ namespace SporSalonuYonetimi.Controllers
             }
 
             var trainer = await _context.Trainers
+                .Include(t => t.Services) // Silmeden önce ne ders verdiğini görelim
                 .FirstOrDefaultAsync(m => m.TrainerId == id);
             if (trainer == null)
             {

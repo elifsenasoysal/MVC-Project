@@ -27,6 +27,8 @@ namespace SporSalonuYonetimi.Models
 
         // --------------------------------
 
+        public bool IsConfirmed { get; set; } = false; // randevu onaylandı mı 
+
         // Diğer bağlantılar (Hizmet ve Antrenör)
         public int TrainerId { get; set; }
         [ForeignKey("TrainerId")]

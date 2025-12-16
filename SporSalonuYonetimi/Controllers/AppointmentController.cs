@@ -40,29 +40,43 @@ namespace SporSalonuYonetimi.Controllers
         }
 
         // 2. KAYDET (POST)
+        // 2. KAYDET (POST)
         [HttpPost]
         public async Task<IActionResult> Create(Appointment appointment)
         {
-            // --- KRİTİK NOKTA ---
-            // Giriş yapan kullanıcının ID'sini STRING olarak alıyoruz.
-            // Appointment modelinde de UserId string olduğu için tam uyumlu!
             var userId = _userManager.GetUserId(User);
             appointment.UserId = userId;
 
-            // Hata vermemesi için, formdan gelmeyen alanları validasyon dışı bırak
             ModelState.Remove("CreatedDate");
             ModelState.Remove("UserId");
             ModelState.Remove("Trainer");
             ModelState.Remove("Service");
-            ModelState.Remove("User"); // IdentityUser nesnesi formdan gelmez
+            ModelState.Remove("User");
 
-            // Tarih Kontrolü
+            // 1. MEVCUT KONTROLÜN (Geçmiş Tarih)
             if (appointment.AppointmentDate < DateTime.Now)
             {
                 ModelState.AddModelError("", "Geçmiş bir tarihe randevu alamazsınız.");
             }
 
-            // Eğer veriler düzgünse kaydet
+            // PostgreSQL'e "Bu gelen tarih UTC formatındadır" diyoruz.
+            // Bunu demezsek "Unspecified Kind" hatası verir.
+            appointment.AppointmentDate = DateTime.SpecifyKind(appointment.AppointmentDate, DateTimeKind.Utc);
+            //
+
+            // --- 2. YENİ EKLENECEK KISIM (Çakışma Kontrolü) ---
+            // Veritabanına sor: Bu Hoca'nın, Bu Saatte başka kaydı var mı?
+            bool isTrainerBusy = await _context.Appointments.AnyAsync(a =>
+                a.TrainerId == appointment.TrainerId &&
+                a.AppointmentDate == appointment.AppointmentDate);
+
+            if (isTrainerBusy)
+            {
+                ModelState.AddModelError("", "Seçtiğiniz antrenörün bu saatte başka bir randevusu mevcut. Lütfen başka bir saat seçiniz.");
+            }
+            // ---------------------------------------------------
+
+            // Eğer hata yoksa (Tarih geçerliyse VE Hoca boşsa)
             if (ModelState.IsValid)
             {
                 appointment.CreatedDate = DateTime.UtcNow;
@@ -70,11 +84,10 @@ namespace SporSalonuYonetimi.Controllers
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
 
-                // Başarılı olursa Ana Sayfaya dön
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home"); // Veya "Randevularım"a yönlendir
             }
 
-            // Hata varsa formu tekrar doldurup göster
+            // Hata varsa formu tekrar doldur
             var service = await _context.Services.FindAsync(appointment.ServiceId);
             ViewBag.ServiceName = service?.ServiceName;
             ViewBag.Price = service?.Price;
@@ -100,6 +113,38 @@ namespace SporSalonuYonetimi.Controllers
                 .ToListAsync();
 
             return View(appointments);
+        }
+
+        // --- ADMİN PANELİ İÇİN (TÜM RANDEVULARI GÖRÜR) ---
+        [Authorize(Roles = "Admin")] // Bu sayfaya sadece Admin girebilir!
+        public async Task<IActionResult> AdminIndex()
+        {
+            // Tüm randevuları getiriyoruz (Kim almış, Hangi Hoca, Hangi Ders)
+            var allAppointments = await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Trainer)
+                .Include(a => a.User) // Randevuyu alan öğrenciyi de görmek istiyoruz
+                .OrderByDescending(a => a.AppointmentDate) // En yeni en üstte
+                .ToListAsync();
+
+            return View(allAppointments);
+        }
+
+        // --- ADMİNİN RANDEVUYU ONAYLAMASI İÇİN ---
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+
+            if (appointment != null)
+            {
+                appointment.IsConfirmed = true; // Durumu "Onaylandı" yap
+                await _context.SaveChangesAsync();
+            }
+
+            // İşlem bitince yine listeye dön
+            return RedirectToAction(nameof(AdminIndex));
         }
     }
 }

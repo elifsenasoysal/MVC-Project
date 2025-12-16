@@ -36,7 +36,14 @@
                                 <td>@item.Trainer?.FullName</td>
                                 <td>@item.Service?.Price ₺</td>
                                 <td>
-                                    <span class="badge bg-success">Aktif</span>
+                                    @if (item.IsConfirmed)
+                                    {
+                                        <span class="badge bg-success">Onaylandı</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Bekliyor</span>
+                                    }
                                 </td>
                             </tr>
                         }

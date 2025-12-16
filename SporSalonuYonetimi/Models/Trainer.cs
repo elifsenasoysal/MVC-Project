@@ -14,9 +14,9 @@ namespace SporSalonuYonetimi.Models
         public string Specialization { get; set; } // Örn: Kas Geliştirme, Kilo Verme
 
         // Antrenörün verebildiği hizmetler (Many-to-Many ilişki için)
-        public ICollection<Service> Services { get; set; }
+        public ICollection<Service> Services { get; set; }= new List<Service>();
         
         // Randevular listesi
-        public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }= new List<Appointment>();
     }
 }

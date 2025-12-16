@@ -18,6 +18,6 @@ namespace SporSalonuYonetimi.Models
         public decimal Price { get; set; }
 
         // Bir hizmeti birden fazla antrenör verebilir
-        public ICollection<Trainer> Trainers { get; set; }
+        public virtual ICollection<Trainer> Trainers { get; set; } = new List<Trainer>();
     }
 }

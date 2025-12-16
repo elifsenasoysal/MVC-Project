@@ -1,0 +1,77 @@
+@model IEnumerable<SporSalonuYonetimi.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Randevu Yönetim Paneli";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger">🛡️ Randevu Yönetim Paneli</h2>
+        <span class="badge bg-secondary">Toplam @Model.Count() Randevu</span>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Tarih & Saat</th>
+                        <th>Öğrenci (Üye)</th>
+                        <th>Hizmet</th>
+                        <th>Antrenör</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+
+                            <td>
+                                <i class="bi bi-person-circle"></i>
+                                @(item.User != null ? item.User.UserName : "Silinmiş Üye")
+                            </td>
+
+                            <td>@item.Service?.ServiceName</td>
+                            <td>@item.Trainer?.FullName</td>
+
+                            <td>
+                                @if (item.IsConfirmed)
+                                {
+                                    <span class="badge bg-success">✅ Onaylandı</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">⏳ Bekliyor</span>
+                                }
+                            </td>
+
+                            <td>
+                                <div class="btn-group" role="group">
+
+                                    @if (!item.IsConfirmed)
+                                    {
+                                        <form asp-action="Approve" asp-route-id="@item.AppointmentId" method="post"
+                                            style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-success me-1">Onayla</button>
+                                        </form>
+                                    }
+
+                                    <form asp-action="Delete" asp-route-id="@item.AppointmentId" method="post"
+                                        style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Silmek istediğine emin misin?');">
+                                            İptal
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
