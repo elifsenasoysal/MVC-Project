@@ -146,5 +146,64 @@ namespace SporSalonuYonetimi.Controllers
             // İşlem bitince yine listeye dön
             return RedirectToAction(nameof(AdminIndex));
         }
+
+
+
+        // 1. KULLANICI İÇİN: İPTAL ETME (Cancel)
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.IsCancelled = true; // Sadece iptal kutusunu işaretle
+                                                // (IsRejected'a dokunma, bu kullanıcının kararı)
+                await _context.SaveChangesAsync();
+            }
+
+            if (User.IsInRole("Admin")) return RedirectToAction(nameof(AdminIndex));
+            return RedirectToAction(nameof(Index));
+        }
+
+        // 2. ADMİN İÇİN: REDDETME (Reject) - YENİ
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Reject(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.IsRejected = true; // Reddedildi olarak işaretle
+                appointment.IsConfirmed = false; // Onaylıysa onayını kaldır
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(AdminIndex));
+        }
+
+        // 2. RANDEVUYU TAMAMEN SİL (Veritabanından uçurur)
+        [HttpPost]
+        [Authorize(Roles = "Admin")] // Sadece Admin tamamen silebilir
+        public async Task<IActionResult> Delete(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                _context.Appointments.Remove(appointment); // Komple sil
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(AdminIndex)); // Admin paneline dön
+        }
+
+        // --- RANDEVU ALMA GİRİŞ EKRANI (HİZMET SEÇİMİ) ---
+        [Authorize] // Sadece giriş yapanlar görebilir! (Girmeyen Login'e atılır)
+        public async Task<IActionResult> BookingPanel()
+        {
+            // Veritabanındaki tüm hizmetleri çekip ekrana gönderiyoruz
+            var services = await _context.Services.ToListAsync();
+            return View(services);
+        }
     }
 }

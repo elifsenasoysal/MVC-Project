@@ -22,11 +22,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // 3. Veritabanındaki Hizmetleri ÇEK ve Sayfaya Gönder
-        // Eğer burası boşsa veya sadece "return View();" varsa ekrana hiçbir şey gelmez.
-        var services = await _context.Services.ToListAsync();
-
-        return View(services);
+        return View();
     }
 
     public IActionResult Privacy()

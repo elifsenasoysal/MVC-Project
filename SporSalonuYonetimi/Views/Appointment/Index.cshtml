@@ -36,13 +36,35 @@
                                 <td>@item.Trainer?.FullName</td>
                                 <td>@item.Service?.Price ₺</td>
                                 <td>
-                                    @if (item.IsConfirmed)
+                                    @if (item.IsRejected)
+                                    {
+                                        <span class="badge bg-danger">Reddedildi</span>
+                                        <div class="text-danger small mt-1" style="font-size: 0.75rem;">
+                                        </div>
+                                    }
+                                    else if (item.IsCancelled)
+                                    {
+                                        <span class="badge bg-secondary">İptal Edildi</span>
+                                    }
+                                    else if (item.IsConfirmed)
                                     {
                                         <span class="badge bg-success">Onaylandı</span>
                                     }
                                     else
                                     {
                                         <span class="badge bg-warning text-dark">Bekliyor</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!item.IsCancelled && item.AppointmentDate > DateTime.Now)
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@item.AppointmentId" method="post">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Randevunuzu iptal etmek istiyor musunuz?');">
+                                                Randevuyu İptal Et
+                                            </button>
+                                        </form>
                                     }
                                 </td>
                             </tr>

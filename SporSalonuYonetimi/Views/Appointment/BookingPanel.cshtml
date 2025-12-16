@@ -1,0 +1,47 @@
+@model IEnumerable<SporSalonuYonetimi.Models.Service>
+
+@{
+    ViewData["Title"] = "Randevu Al";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary">📅 Randevu Oluştur</h2>
+        <p class="lead text-muted">Lütfen randevu almak istediğiniz hizmeti seçiniz.</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            Aktif hizmet bulunamadı. Lütfen yönetici ile iletişime geçin.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0 hover-effect">
+                        <div class="card-header bg-dark text-white text-center py-3">
+                            <h4 class="m-0">@item.ServiceName</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column text-center">
+                            <h2 class="card-title text-primary my-3">@item.Price ₺</h2>
+                            <p class="text-muted mb-4">
+                                <i class="bi bi-clock"></i> Süre: @item.DurationMinutes Dakika
+                            </p>
+                            
+                            <div class="mt-auto">
+                                <a asp-controller="Appointment" asp-action="Create" asp-route-serviceId="@item.ServiceId" 
+                                   class="btn btn-outline-primary btn-lg w-100 fw-bold">
+                                    Seç ve Devam Et
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
