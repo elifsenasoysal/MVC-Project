@@ -59,7 +59,7 @@ namespace SporSalonuYonetimi.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // DEĞİŞİKLİK: int[] selectedServices parametresi eklendi
-        public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization")] Trainer trainer, int[] selectedServices)
+        public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
             // Gelen Hizmet ID'lerini antrenöre ekle
             if (selectedServices != null)
@@ -83,7 +83,7 @@ namespace SporSalonuYonetimi.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            
+
             // Hata varsa listeyi tekrar yükle
             ViewBag.Services = _context.Services.ToList();
             return View(trainer);
@@ -115,7 +115,7 @@ namespace SporSalonuYonetimi.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // DEĞİŞİKLİK: Güncelleme mantığı değişti
-        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization")] Trainer trainer, int[] selectedServices)
+        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
             if (id != trainer.TrainerId)
             {
@@ -141,7 +141,7 @@ namespace SporSalonuYonetimi.Controllers
 
                     // 3. İlişkileri Güncelle (Eskileri sil, yenileri ekle)
                     trainerToUpdate.Services.Clear(); // Önceki dersleri temizle
-                    
+
                     if (selectedServices != null)
                     {
                         foreach (var serviceId in selectedServices)

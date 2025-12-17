@@ -15,5 +15,7 @@ namespace SporSalonuYonetimi.Data
         public DbSet<Service> Services { get; set; }
         public DbSet<Trainer> Trainers { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+
+        public DbSet<SalonConfig> SalonConfigs { get; set; }
     }
 }

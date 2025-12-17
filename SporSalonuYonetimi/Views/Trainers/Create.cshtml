@@ -46,6 +46,16 @@
                     }
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label asp-for="WorkStartHour" class="control-label fw-bold"></label>
+                    <input asp-for="WorkStartHour" type="number" min="0" max="23" class="form-control" />
+                </div>
+                <div class="col-md-6 form-group mb-3">
+                    <label asp-for="WorkEndHour" class="control-label fw-bold"></label>
+                    <input asp-for="WorkEndHour" type="number" min="0" max="23" class="form-control" />
+                </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

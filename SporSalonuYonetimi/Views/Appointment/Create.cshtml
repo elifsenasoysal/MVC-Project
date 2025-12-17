@@ -2,50 +2,102 @@
 
 @{
     ViewData["Title"] = "Randevu Al";
+    var serviceName = ViewBag.ServiceName;
 }
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h4>📅 Randevu Oluştur</h4>
+                    <h4>📅 @serviceName İçin Randevu Oluştur</h4>
                 </div>
                 <div class="card-body">
-                    
-                    <div class="alert alert-info">
-                        Seçilen Hizmet: <strong>@ViewBag.ServiceName</strong> <br>
-                        Ücret: <strong>@ViewBag.Price ₺</strong>
-                    </div>
-
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Create" id="bookingForm">
                         <input type="hidden" asp-for="ServiceId" value="@ViewBag.ServiceId" />
-
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label fw-bold">Antrenör Seçiniz</label>
-                            <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.Trainers">
-                                <option value="">-- Lütfen bir eğitmen seçin --</option>
+                        
+                        <div class="form-group mb-4">
+                            <label class="fw-bold">Antrenör Seçiniz:</label>
+                            <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.Trainers" id="trainerSelect">
+                                <option value="">-- Lütfen Önce Antrenör Seçin --</option>
                             </select>
-                            <span asp-validation-for="TrainerId" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label fw-bold">Tarih ve Saat</label>
-                            <input asp-for="AppointmentDate" class="form-control" type="datetime-local" 
-                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                        <div class="form-group mb-4">
+                            <label class="fw-bold">Tarih Seçiniz:</label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control" id="dateSelect" 
+                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" /> </div>
+
+                        <div class="form-group mb-4">
+                            <label class="fw-bold d-block">Müsait Saatler:</label>
+                            <div id="timeSlots" class="d-flex flex-wrap gap-2">
+                                <span class="text-muted small">Lütfen önce antrenör ve tarih seçiniz.</span>
+                            </div>
+                            <input type="hidden" name="SelectedTime" id="selectedTimeInput" />
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Randevuyu Onayla</button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">İptal</a>
-                        </div>
+                        <button type="submit" class="btn btn-success w-100 btn-lg" id="submitBtn" disabled>
+                            Randevuyu Onayla
+                        </button>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Antrenör veya Tarih değişirse çalışır
+        $('#trainerSelect, #dateSelect').change(function () {
+            var trainerId = $('#trainerSelect').val();
+            var date = $('#dateSelect').val();
+            var slotsDiv = $('#timeSlots');
+            var submitBtn = $('#submitBtn');
+
+            // Eğer ikisi de seçiliyse sorgu yap
+            if (trainerId && date) {
+                slotsDiv.html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div> Saatler kontrol ediliyor...');
+                
+                // Backend'deki GetAvailableHours metoduna git
+                $.ajax({
+                    url: '/Appointment/GetAvailableHours',
+                    data: { trainerId: trainerId, date: date },
+                    success: function (data) {
+                        slotsDiv.empty(); // Eski saatleri temizle
+
+                        if (data.message) {
+                            slotsDiv.html('<div class="alert alert-warning">' + data.message + '</div>');
+                        } 
+                        else if (data.length === 0) {
+                            slotsDiv.html('<div class="alert alert-danger">Maalesef bu tarihte uygun saat yok.</div>');
+                        } 
+                        else {
+                            // Gelen saatleri buton olarak ekrana bas
+                            $.each(data, function (index, time) {
+                                var btn = $('<button type="button" class="btn btn-outline-primary time-slot">' + time + '</button>');
+                                
+                                // Saate tıklayınca ne olsun?
+                                btn.click(function () {
+                                    // Diğer butonların rengini normale döndür
+                                    $('.time-slot').removeClass('btn-primary').addClass('btn-outline-primary');
+                                    // Tıklananı mavi yap
+                                    $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+                                    
+                                    // Gizli inputa saati yaz (Örn: 14:00)
+                                    // Backend'de bunu tarihle birleştireceğiz
+                                    $('#selectedTimeInput').val(time);
+                                    
+                                    // Kaydet butonunu aktif et
+                                    submitBtn.prop('disabled', false);
+                                });
+                                
+                                slotsDiv.append(btn);
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

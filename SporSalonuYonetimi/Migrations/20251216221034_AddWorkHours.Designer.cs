@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SporSalonuYonetimi.Data;
@@ -11,9 +12,11 @@ using SporSalonuYonetimi.Data;
 namespace SporSalonuYonetimi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251216221034_AddWorkHours")]
+    partial class AddWorkHours
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,28 +277,6 @@ namespace SporSalonuYonetimi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Appointments");
-                });
-
-            modelBuilder.Entity("SporSalonuYonetimi.Models.SalonConfig", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CloseHour")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsWeekendOpen")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("OpenHour")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SalonConfigs");
                 });
 
             modelBuilder.Entity("SporSalonuYonetimi.Models.Service", b =>

@@ -39,55 +39,69 @@ namespace SporSalonuYonetimi.Controllers
             return View();
         }
 
-        // 2. KAYDET (POST)
-        // 2. KAYDET (POST)
+        // POST: Appointment/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Appointment appointment)
+        // ValidateAntiForgeryToken varsa kalsın
+        // DİKKAT: Parametre kısmına 'string SelectedTime' ekledik!
+        public async Task<IActionResult> Create(Appointment appointment, string SelectedTime)
         {
             var userId = _userManager.GetUserId(User);
             appointment.UserId = userId;
 
+            // Formdan gelmeyen verileri validasyondan çıkar
             ModelState.Remove("CreatedDate");
             ModelState.Remove("UserId");
             ModelState.Remove("Trainer");
             ModelState.Remove("Service");
             ModelState.Remove("User");
 
-            // 1. MEVCUT KONTROLÜN (Geçmiş Tarih)
+            // 1. SAAT BİRLEŞTİRME İŞLEMİ (HATAYI ÇÖZEN KISIM)
+            if (!string.IsNullOrEmpty(SelectedTime))
+            {
+                // Gelen veri "14:00" formatında string
+                var timeParts = SelectedTime.Split(':');
+                int hour = int.Parse(timeParts[0]);
+                int minute = int.Parse(timeParts[1]);
+
+                // Tarihin üzerine saati ekle
+                appointment.AppointmentDate = appointment.AppointmentDate.Date.AddHours(hour).AddMinutes(minute);
+
+                // UTC Ayarı (Postgres için)
+                appointment.AppointmentDate = DateTime.SpecifyKind(appointment.AppointmentDate, DateTimeKind.Utc);
+            }
+            else
+            {
+                // Eğer saat seçilmemişse hata ekle
+                ModelState.AddModelError("", "Lütfen bir saat seçiniz.");
+            }
+
+            // 2. GEÇMİŞ TARİH KONTROLÜ
             if (appointment.AppointmentDate < DateTime.Now)
             {
                 ModelState.AddModelError("", "Geçmiş bir tarihe randevu alamazsınız.");
             }
 
-            // PostgreSQL'e "Bu gelen tarih UTC formatındadır" diyoruz.
-            // Bunu demezsek "Unspecified Kind" hatası verir.
-            appointment.AppointmentDate = DateTime.SpecifyKind(appointment.AppointmentDate, DateTimeKind.Utc);
-            //
-
-            // --- 2. YENİ EKLENECEK KISIM (Çakışma Kontrolü) ---
-            // Veritabanına sor: Bu Hoca'nın, Bu Saatte başka kaydı var mı?
+            // 3. ÇAKIŞMA KONTROLÜ
             bool isTrainerBusy = await _context.Appointments.AnyAsync(a =>
                 a.TrainerId == appointment.TrainerId &&
-                a.AppointmentDate == appointment.AppointmentDate);
+                a.AppointmentDate == appointment.AppointmentDate &&
+                !a.IsCancelled && !a.IsRejected); // İptal/Red hariç
 
             if (isTrainerBusy)
             {
-                ModelState.AddModelError("", "Seçtiğiniz antrenörün bu saatte başka bir randevusu mevcut. Lütfen başka bir saat seçiniz.");
+                ModelState.AddModelError("", "Seçtiğiniz antrenörün bu saatte başka bir randevusu mevcut.");
             }
-            // ---------------------------------------------------
 
-            // Eğer hata yoksa (Tarih geçerliyse VE Hoca boşsa)
+            // 4. KAYDETME
             if (ModelState.IsValid)
             {
                 appointment.CreatedDate = DateTime.UtcNow;
-
-                _context.Appointments.Add(appointment);
+                _context.Add(appointment);
                 await _context.SaveChangesAsync();
-
-                return RedirectToAction("Index", "Home"); // Veya "Randevularım"a yönlendir
+                return RedirectToAction("Index", "Home");
             }
 
-            // Hata varsa formu tekrar doldur
+            // Hata varsa sayfayı tekrar doldur
             var service = await _context.Services.FindAsync(appointment.ServiceId);
             ViewBag.ServiceName = service?.ServiceName;
             ViewBag.Price = service?.Price;
