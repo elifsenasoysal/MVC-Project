@@ -24,8 +24,14 @@ namespace SporSalonuYonetimi.Controllers
         // GET: Trainers
         public async Task<IActionResult> Index()
         {
-            // DEĞİŞİKLİK: Antrenörleri getirirken verdikleri hizmetleri de (Services) yanına ekle
-            return View(await _context.Trainers.Include(t => t.Services).ToListAsync());
+            // Antrenörleri çekerken, ilişkili oldukları "TrainerServices" ve onun içindeki "Service" tablosunu da getir.
+            // NOT: Eğer projenizde ara tablo ismi farklıysa (örn: sadece Services) ona göre düzenleyin.
+            // Genelde .Include(t => t.TrainerServices).ThenInclude(ts => ts.Service) şeklinde olur.
+
+            var trainers = await _context.Trainers
+                .Include(t => t.Services) // Direkt Services tablosunu çekiyoruz
+                .ToListAsync();
+            return View(trainers);
         }
 
         // GET: Trainers/Details/5
@@ -61,6 +67,23 @@ namespace SporSalonuYonetimi.Controllers
         // DEĞİŞİKLİK: int[] selectedServices parametresi eklendi
         public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
+            // Salon Ayarlarını Çek
+            var salonConfig = _context.SalonConfigs.FirstOrDefault();
+
+            if (salonConfig != null)
+            {
+                // 1. Başlangıç Saati Kontrolü
+                if (trainer.WorkStartHour < salonConfig.OpenHour)
+                {
+                    ModelState.AddModelError("WorkStartHour", $"Antrenör, salon açılış saatinden ({salonConfig.OpenHour}:00) önce işe başlayamaz!");
+                }
+
+                // 2. Bitiş Saati Kontrolü
+                if (trainer.WorkEndHour > salonConfig.CloseHour)
+                {
+                    ModelState.AddModelError("WorkEndHour", $"Antrenör, salon kapanış saatinden ({salonConfig.CloseHour}:00) sonra çalışamaz!");
+                }
+            }
             // Gelen Hizmet ID'lerini antrenöre ekle
             if (selectedServices != null)
             {
@@ -92,55 +115,74 @@ namespace SporSalonuYonetimi.Controllers
         // GET: Trainers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // DEĞİŞİKLİK: Mevcut hizmetleriyle beraber getiriyoruz
+            // Antrenörü, mevcut dersleriyle (Services) birlikte çekiyoruz
             var trainer = await _context.Trainers
-                                        .Include(t => t.Services)
-                                        .FirstOrDefaultAsync(t => t.TrainerId == id);
-            if (trainer == null)
-            {
-                return NotFound();
-            }
+                .Include(t => t.Services) // BURASI ÇOK ÖNEMLİ
+                .FirstOrDefaultAsync(m => m.TrainerId == id);
 
-            // Tüm hizmetleri View'a gönder (Checkboxlar için)
-            ViewBag.Services = _context.Services.ToList();
+            if (trainer == null) return NotFound();
+
+            // Tüm dersleri View'a gönderiyoruz ki checkbox listesi oluşturabilelim
+            ViewBag.AllServices = await _context.Services.ToListAsync();
+
             return View(trainer);
         }
 
         // POST: Trainers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // DEĞİŞİKLİK: Güncelleme mantığı değişti
         public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
+            // 1. Güvenlik Kontrolü
             if (id != trainer.TrainerId)
             {
                 return NotFound();
             }
 
-            ModelState.Remove("Services");
+            // 2. Salon Saatleri Kontrolü (Senin istediğin özellik)
+            var salonConfig = _context.SalonConfigs.FirstOrDefault();
+            if (salonConfig != null)
+            {
+                if (trainer.WorkStartHour < salonConfig.OpenHour)
+                {
+                    ModelState.AddModelError("WorkStartHour", $"Antrenör, salon açılış saatinden ({salonConfig.OpenHour}:00) önce işe başlayamaz!");
+                }
+                if (trainer.WorkEndHour > salonConfig.CloseHour)
+                {
+                    ModelState.AddModelError("WorkEndHour", $"Antrenör, salon kapanış saatinden ({salonConfig.CloseHour}:00) sonra çalışamaz!");
+                }
+            }
 
+            // 3. Geçerlilik Kontrolü
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // 1. Veritabanındaki asıl antrenörü ilişkileriyle beraber çek
+                    // --- KRİTİK NOKTA ---
+                    // Formdan gelen 'trainer' nesnesini direkt kaydetmek yerine,
+                    // Veritabanındaki GERÇEK kaydı çekip, onun üzerini yazıyoruz.
+                    // Bu sayede ilişkiler (Services) bozulmaz.
+
                     var trainerToUpdate = await _context.Trainers
-                        .Include(t => t.Services)
+                        .Include(t => t.Services) // Mevcut servisleriyle beraber çek
                         .FirstOrDefaultAsync(t => t.TrainerId == id);
 
-                    if (trainerToUpdate == null) return NotFound();
+                    if (trainerToUpdate == null)
+                    {
+                        return NotFound();
+                    }
 
-                    // 2. Bilgileri güncelle
+                    // A. Basit Bilgileri Güncelle
                     trainerToUpdate.FullName = trainer.FullName;
                     trainerToUpdate.Specialization = trainer.Specialization;
+                    trainerToUpdate.WorkStartHour = trainer.WorkStartHour;
+                    trainerToUpdate.WorkEndHour = trainer.WorkEndHour;
 
-                    // 3. İlişkileri Güncelle (Eskileri sil, yenileri ekle)
-                    trainerToUpdate.Services.Clear(); // Önceki dersleri temizle
+                    // B. Hizmetleri (Dersleri) Güncelle
+                    // Önce eskisini temizle, sonra yenileri ekle
+                    trainerToUpdate.Services.Clear();
 
                     if (selectedServices != null)
                     {
@@ -154,7 +196,7 @@ namespace SporSalonuYonetimi.Controllers
                         }
                     }
 
-                    // 4. Kaydet
+                    // C. Kaydet
                     _context.Update(trainerToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -172,7 +214,19 @@ namespace SporSalonuYonetimi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Services = _context.Services.ToList();
+            // Hata varsa sayfayı tekrar yükle (Dersleri tekrar seçili getirmek için)
+            // Burası View tarafında Checkboxları doldurmak için gerekli
+            var allServices = _context.Services.ToList();
+            var trainerServices = trainer.Services?.Select(s => s.ServiceId).ToList() ?? new List<int>();
+
+            // View'a verileri tekrar gönderiyoruz ki ekran boş gelmesin
+            ViewData["Services"] = allServices.Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = s.ServiceId.ToString(),
+                Text = s.ServiceName,
+                Selected = selectedServices.Contains(s.ServiceId)
+            }).ToList();
+
             return View(trainer);
         }
 

@@ -34,8 +34,10 @@ namespace SporSalonuYonetimi.Controllers
             ViewBag.Price = service.Price;
 
             // Antrenörleri listele (Dropdown için)
-            ViewBag.Trainers = new SelectList(_context.Trainers, "TrainerId", "FullName");
-
+            var availableTrainers = await _context.Trainers
+                .Where(t => t.Services.Any(s => s.ServiceId == serviceId))
+                .ToListAsync();
+            ViewBag.Trainers = new SelectList(availableTrainers, "TrainerId", "FullName");
             return View();
         }
 
