@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity; // Bunu eklemek zorundayız çünkü IdentityUser'ı kullanacağız
+using Microsoft.AspNetCore.Identity;
 
 namespace SporSalonuYonetimi.Models
 {
@@ -16,8 +16,6 @@ namespace SporSalonuYonetimi.Models
         [Display(Name = "Oluşturulma Tarihi")]
         public DateTime CreatedDate { get; set; }
 
-        // --- İŞTE KRİTİK NOKTA BURASI ---
-        
         // IdentityUser'ın ID'si string olduğu için burayı string yapıyoruz
         public string? UserId { get; set; } 
 
@@ -25,15 +23,12 @@ namespace SporSalonuYonetimi.Models
         [ForeignKey("UserId")]
         public virtual IdentityUser? User { get; set; }
 
-        // --------------------------------
-
         public bool IsConfirmed { get; set; } = false; // randevu onaylandı mı 
 
-        public bool IsCancelled { get; set; } = false; // İptal edildi mi?
+        public bool IsCancelled { get; set; } = false; // iptal edildi mi?
 
         public bool IsRejected { get; set; } = false; // Admin reddi
 
-        // Diğer bağlantılar (Hizmet ve Antrenör)
         public int TrainerId { get; set; }
         [ForeignKey("TrainerId")]
         public virtual Trainer? Trainer { get; set; }

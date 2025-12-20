@@ -6,25 +6,22 @@ namespace SporSalonuYonetimi.Models
     {
         public int Id { get; set; }
 
-        // --- HAFTA İÇİ AYARLARI ---
+        // hafta içi ayarları
         public int WeekDayMorningStart { get; set; } = 5;
         public int WeekDayMorningEnd { get; set; } = 9;
         public int WeekDayEveningStart { get; set; } = 17;
         public int WeekDayEveningEnd { get; set; } = 22;
 
-        // --- HAFTA SONU AYARLARI (Cumartesi ve Pazar için Ortak) ---
-        // İsimleri 'Saturday' yerine 'Weekend' yaptık
+        // hafta sonu ayarları (Cumartesi ve Pazar için Ortak)
         public int WeekendMorningStart { get; set; } = 5;
         public int WeekendMorningEnd { get; set; } = 9;
 
         public int WeekendEveningStart { get; set; } = 17;
         public int WeekendEveningEnd { get; set; } = 20;
 
-        // --- PAZAR GÜNÜ KONTROLÜ ---
-        // True ise hafta sonu saatlerini uygular, False ise kapalıdır.
+        //pazar açık mı kapalı mı
         public bool IsSundayOpen { get; set; } = false;
 
-        // --- GÖRÜNÜM İÇİN OTOMATİK METİNLER ---
         [NotMapped]
         public string WeekDayMorningText => $"{WeekDayMorningStart:00}:00 - {WeekDayMorningEnd:00}:00";
         [NotMapped]

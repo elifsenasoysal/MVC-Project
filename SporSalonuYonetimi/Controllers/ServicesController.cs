@@ -52,8 +52,7 @@ namespace SporSalonuYonetimi.Controllers
         }
 
         // POST: Services/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ServiceId,ServiceName,DurationMinutes,Price")] Service service)
@@ -67,7 +66,7 @@ namespace SporSalonuYonetimi.Controllers
             return View(service);
         }
 
-        // GET: Services/Edit/5
+        // GET: Services/Edit/
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,9 +82,8 @@ namespace SporSalonuYonetimi.Controllers
             return View(service);
         }
 
-        // POST: Services/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Services/Edit/
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ServiceId,ServiceName,DurationMinutes,Price")] Service service)

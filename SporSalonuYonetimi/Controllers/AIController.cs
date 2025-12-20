@@ -7,7 +7,6 @@ namespace SporSalonuYonetimi.Controllers
 {
     public class AIController : Controller
     {
-        // Google API Key'in burada kalacak
         private readonly string _geminiApiKey = "YOUR_GOOGLE_GEMINI_API_KEY";
 
         [HttpGet]
@@ -19,15 +18,14 @@ namespace SporSalonuYonetimi.Controllers
         [HttpPost]
         public async Task<IActionResult> GeneratePlan(int age, double weight, double height, string goal, string gender, IFormFile userImage)
         {
-            // 1. RESİM OLUŞTURMA (Pollinations - Gelecekteki hali)
+            // resim oluşturma (Pollinations - Gelecekteki hali)
             string imagePrompt = $"fitness photo of a {age} years old {gender}, {goal}, athletic body, gym environment, realistic lighting, 4k";
             string encodedPrompt = System.Net.WebUtility.UrlEncode(imagePrompt);
             string generatedImageUrl = $"https://image.pollinations.ai/prompt/{encodedPrompt}?width=512&height=512&nologo=true";
 
-            // 2. METİN VE ANALİZ OLUŞTURMA (Google Gemini - Vision)
+            // metin ve analiz oluşturma (Google Gemini - Vision)
             string planText = "Analiz yapılamadı.";
 
-            // Kullanıcı resim yükledi mi kontrolü
             string base64Image = "";
             string mimeType = "";
 
@@ -48,10 +46,8 @@ namespace SporSalonuYonetimi.Controllers
                 {
                     string apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_geminiApiKey}";
 
-                    // Google'a gidecek mesajı hazırlıyoruz
                     var partsList = new List<object>();
 
-                    // A) Metin Sorusu
                     string promptText = $"Ben {age} yaşında, {weight} kilo, {height} cm boyunda bir {gender} bireyim. Hedefim: {goal}. ";
 
                     if (!string.IsNullOrEmpty(base64Image))

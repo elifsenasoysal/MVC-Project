@@ -94,19 +94,17 @@
 <script>
     document.getElementById('aiForm').addEventListener('submit', function(e) {
         
-        // 1. Önce form geçerli mi (dolu mu) kontrol et
+        // form geçerli mi kontrol et
         if (!this.checkValidity()) {
-            // Eğer boş alan varsa bırak tarayıcı uyarı versin, hiçbir şey yapma
+            // eğer boş alan varsa tarayıcı uyarı verir
             return;
         }
 
-        // 2. Her şey doluysa butonu kilitle ve döndür
         var btn = document.getElementById('submitBtn');
         var originalText = btn.innerHTML;
         
-        btn.disabled = true; // Çift tıklamayı önle
+        btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Yapay Zeka Düşünüyor...';
         
-        // Not: Form submit işlemi devam eder, backend'e gider.
     });
 </script>

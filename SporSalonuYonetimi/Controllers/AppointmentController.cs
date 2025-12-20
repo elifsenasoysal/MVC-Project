@@ -8,7 +8,7 @@ using SporSalonuYonetimi.Models;
 
 namespace SporSalonuYonetimi.Controllers
 {
-    [Authorize] // Sadece giriş yapanlar randevu alabilir
+    [Authorize] // sadece giriş yapanlar randevu alabilir
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,7 +20,7 @@ namespace SporSalonuYonetimi.Controllers
             _userManager = userManager;
         }
 
-        // 1. EKRANI GÖSTER (GET)
+        // get- ekranı göster
         [HttpGet]
         public async Task<IActionResult> Create(int? serviceId)
         {
@@ -28,12 +28,12 @@ namespace SporSalonuYonetimi.Controllers
 
             var service = await _context.Services.FindAsync(serviceId);
 
-            // Verileri View'a taşı
+            // verileri viewa taşı
             ViewBag.ServiceName = service.ServiceName;
             ViewBag.ServiceId = service.ServiceId;
             ViewBag.Price = service.Price;
 
-            // Antrenörleri listele (Dropdown için)
+            // antrenörleri listele linq
             var availableTrainers = await _context.Trainers
                 .Where(t => t.Services.Any(s => s.ServiceId == serviceId))
                 .ToListAsync();
@@ -43,29 +43,26 @@ namespace SporSalonuYonetimi.Controllers
 
         // POST: Appointment/Create
         [HttpPost]
-        // ValidateAntiForgeryToken varsa kalsın
-        // DİKKAT: Parametre kısmına 'string SelectedTime' ekledik!
         public async Task<IActionResult> Create(Appointment appointment, string SelectedTime)
         {
             var userId = _userManager.GetUserId(User);
             appointment.UserId = userId;
 
-            // Formdan gelmeyen verileri validasyondan çıkar
             ModelState.Remove("CreatedDate");
             ModelState.Remove("UserId");
             ModelState.Remove("Trainer");
             ModelState.Remove("Service");
             ModelState.Remove("User");
 
-            // 1. SAAT BİRLEŞTİRME İŞLEMİ (HATAYI ÇÖZEN KISIM)
+            // saat birleştirme işlemi
             if (!string.IsNullOrEmpty(SelectedTime))
             {
-                // Gelen veri "14:00" formatında string
+                // veri "14:00" formatında string
                 var timeParts = SelectedTime.Split(':');
                 int hour = int.Parse(timeParts[0]);
                 int minute = int.Parse(timeParts[1]);
 
-                // Tarihin üzerine saati ekle
+                // tarihin üzerine saati ekle
                 appointment.AppointmentDate = appointment.AppointmentDate.Date.AddHours(hour).AddMinutes(minute);
 
                 // UTC Ayarı (Postgres için)
@@ -73,28 +70,28 @@ namespace SporSalonuYonetimi.Controllers
             }
             else
             {
-                // Eğer saat seçilmemişse hata ekle
+                // eğer saat seçilmemişse hata ekle
                 ModelState.AddModelError("", "Lütfen bir saat seçiniz.");
             }
 
-            // 2. GEÇMİŞ TARİH KONTROLÜ
+            // geçmiş tarih kontrol
             if (appointment.AppointmentDate < DateTime.Now)
             {
                 ModelState.AddModelError("", "Geçmiş bir tarihe randevu alamazsınız.");
             }
 
-            // 3. ÇAKIŞMA KONTROLÜ
+            // çakışma kontrolü
             bool isTrainerBusy = await _context.Appointments.AnyAsync(a =>
                 a.TrainerId == appointment.TrainerId &&
                 a.AppointmentDate == appointment.AppointmentDate &&
-                !a.IsCancelled && !a.IsRejected); // İptal/Red hariç
+                !a.IsCancelled && !a.IsRejected); // iptal ve red hariç diğer randevulara bak
 
             if (isTrainerBusy)
             {
                 ModelState.AddModelError("", "Seçtiğiniz antrenörün bu saatte başka bir randevusu mevcut.");
             }
 
-            // 4. KAYDETME
+            // kaydetme
             if (ModelState.IsValid)
             {
                 appointment.CreatedDate = DateTime.UtcNow;
@@ -103,7 +100,7 @@ namespace SporSalonuYonetimi.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Hata varsa sayfayı tekrar doldur
+            // hata varsa sayfayı tekrar doldur
             var service = await _context.Services.FindAsync(appointment.ServiceId);
             ViewBag.ServiceName = service?.ServiceName;
             ViewBag.Price = service?.Price;
@@ -113,19 +110,18 @@ namespace SporSalonuYonetimi.Controllers
             return View(appointment);
         }
 
-        // Randevularımı Listele (GET)
+        // randevularımı listele
         public async Task<IActionResult> Index()
         {
-            // 1. Giriş yapan kullanıcının ID'sini al
+            // giriş yapan kullanıcının ID'si alınır
             var userId = _userManager.GetUserId(User);
 
-            // 2. Sadece bu kullanıcıya ait randevuları bul
-            // .Include() komutları sayesinde Hizmet ve Antrenör isimlerini de getiriyoruz
+            // ve sadece bu kullanıcıya ait randevuları bulup getiririz
             var appointments = await _context.Appointments
                 .Include(a => a.Service)
                 .Include(a => a.Trainer)
-                .Where(a => a.UserId == userId) // Filtreleme: Sadece benimkiler
-                .OrderByDescending(a => a.AppointmentDate) // En yeni tarih en üstte
+                .Where(a => a.UserId == userId)
+                .OrderByDescending(a => a.AppointmentDate) // en yeni tarih en üstte olucak şekilde sıraladık
                 .ToListAsync();
 
             return View(appointments);
@@ -155,17 +151,17 @@ namespace SporSalonuYonetimi.Controllers
 
             if (appointment != null)
             {
-                appointment.IsConfirmed = true; // Durumu "Onaylandı" yap
+                appointment.IsConfirmed = true;
                 await _context.SaveChangesAsync();
             }
 
-            // İşlem bitince yine listeye dön
+            // işlem bitince yine listeye dön
             return RedirectToAction(nameof(AdminIndex));
         }
 
 
 
-        // 1. KULLANICI İÇİN: İPTAL ETME (Cancel)
+        //KULLANICI İÇİN: İPTAL ETME
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Cancel(int id)
@@ -173,8 +169,7 @@ namespace SporSalonuYonetimi.Controllers
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment != null)
             {
-                appointment.IsCancelled = true; // Sadece iptal kutusunu işaretle
-                                                // (IsRejected'a dokunma, bu kullanıcının kararı)
+                appointment.IsCancelled = true; // iptal kutusunu işaretle
                 await _context.SaveChangesAsync();
             }
 
@@ -182,7 +177,7 @@ namespace SporSalonuYonetimi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 2. ADMİN İÇİN: REDDETME (Reject) - YENİ
+        //ADMİN İÇİN: REDDETME
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Reject(int id)
@@ -190,15 +185,15 @@ namespace SporSalonuYonetimi.Controllers
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment != null)
             {
-                appointment.IsRejected = true; // Reddedildi olarak işaretle
-                appointment.IsConfirmed = false; // Onaylıysa onayını kaldır
+                appointment.IsRejected = true; // reddedildi olarak işaretle
+                appointment.IsConfirmed = false; // onaylıysa onayını kaldır
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(AdminIndex));
         }
 
-        // 2. RANDEVUYU TAMAMEN SİL (Veritabanından uçurur)
+        //RANDEVUYU TAMAMEN SİL
         [HttpPost]
         [Authorize(Roles = "Admin")] // Sadece Admin tamamen silebilir
         public async Task<IActionResult> Delete(int id)
@@ -206,18 +201,18 @@ namespace SporSalonuYonetimi.Controllers
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment != null)
             {
-                _context.Appointments.Remove(appointment); // Komple sil
+                _context.Appointments.Remove(appointment); // komple sil
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(AdminIndex)); // Admin paneline dön
+            return RedirectToAction(nameof(AdminIndex)); // admin paneline dön
         }
 
-        // --- RANDEVU ALMA GİRİŞ EKRANI (HİZMET SEÇİMİ) ---
-        [Authorize] // Sadece giriş yapanlar görebilir! (Girmeyen Login'e atılır)
+        // --- RANDEVU ALMA GİRİŞ EKRANI ---
+        [Authorize] // sadece giriş yapanlar görebilir girmeyen Login'e atılır
         public async Task<IActionResult> BookingPanel()
         {
-            // Veritabanındaki tüm hizmetleri çekip ekrana gönderiyoruz
+            // veritabanındaki tüm hizmetleri çekip ekrana gönderiyoruz
             var services = await _context.Services.ToListAsync();
             return View(services);
         }

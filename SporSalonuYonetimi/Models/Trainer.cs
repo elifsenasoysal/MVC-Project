@@ -11,12 +11,10 @@ namespace SporSalonuYonetimi.Models
         public string FullName { get; set; }
 
         [Display(Name = "Uzmanlık Alanı")]
-        public string Specialization { get; set; } // Senin kodun (Specialty yerine bunu kullanacağız)
+        public string Specialization { get; set; }
 
-        // --- SADECE BU EKLENDİ ---
         [Display(Name = "Profil Fotoğrafı")]
         public byte[]? Image { get; set; }
-        // --------------------------
 
         [Display(Name = "Mesai Başlangıç Saati")]
         [Range(0, 23)]

@@ -9,10 +9,10 @@ namespace SporSalonuYonetimi.Models
 
         [Required(ErrorMessage = "Hizmet adı zorunludur.")]
         [Display(Name = "Hizmet Adı")]
-        public string ServiceName { get; set; } // Örn: Fitness, Yoga
+        public string ServiceName { get; set; }
 
         [Display(Name = "Süre (Dakika)")]
-        public int DurationMinutes { get; set; } // Örn: 60 dk
+        public int DurationMinutes { get; set; }
 
         [Display(Name = "Ücret")]
         public decimal Price { get; set; }

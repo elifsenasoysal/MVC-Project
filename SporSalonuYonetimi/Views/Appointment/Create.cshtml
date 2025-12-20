@@ -78,7 +78,7 @@
                         data: { trainerId: trainerId, date: date },
                         success: function (data)
                         {
-                            slotsDiv.empty(); // Yükleniyor yazısını kaldır
+                            slotsDiv.empty();
 
                             if (data.length === 0)
                             {
@@ -94,11 +94,11 @@
                                     var disabledAttr = item.isFull ? 'disabled' : '';
                                     var buttonText = item.time;
 
-                                    // Doluysa yanına (Dolu) yazalım
+                                    // Doluysa yanına yazalım
                                     if (item.isFull)
                                     {
                                         buttonText += ' (Dolu)';
-                                        btnClass = 'btn-secondary'; // İstersen gri yap (btn-secondary) ya da kırmızı (btn-danger)
+                                        btnClass = 'btn-secondary';
                                     }
 
                                     // Butonu oluştur

@@ -25,11 +25,8 @@ namespace SporSalonuYonetimi.Controllers
         public async Task<IActionResult> Index()
         {
             // Antrenörleri çekerken, ilişkili oldukları "TrainerServices" ve onun içindeki "Service" tablosunu da getir.
-            // NOT: Eğer projenizde ara tablo ismi farklıysa (örn: sadece Services) ona göre düzenleyin.
-            // Genelde .Include(t => t.TrainerServices).ThenInclude(ts => ts.Service) şeklinde olur.
-
             var trainers = await _context.Trainers
-                .Include(t => t.Services) // Direkt Services tablosunu çekiyoruz
+                .Include(t => t.Services)
                 .ToListAsync();
             return View(trainers);
         }
@@ -43,7 +40,7 @@ namespace SporSalonuYonetimi.Controllers
             }
 
             var trainer = await _context.Trainers
-                .Include(t => t.Services) // DEĞİŞİKLİK: Detay sayfasında hizmetleri de görelim
+                .Include(t => t.Services)
                 .FirstOrDefaultAsync(m => m.TrainerId == id);
             if (trainer == null)
             {
@@ -56,7 +53,6 @@ namespace SporSalonuYonetimi.Controllers
         // GET: Trainers/Create
         public IActionResult Create()
         {
-            // DEĞİŞİKLİK: Checkbox listesi için tüm hizmetleri View'a gönderiyoruz
             ViewBag.Services = _context.Services.ToList();
             return View();
         }
@@ -64,17 +60,14 @@ namespace SporSalonuYonetimi.Controllers
         // POST: Trainers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // DEĞİŞİKLİK: int[] selectedServices parametresi eklendi
         public async Task<IActionResult> Create([Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
             // Salon Ayarlarını Çek
             var salonConfig = _context.SalonConfigs.FirstOrDefault();
             if (salonConfig != null)
             {
-                // Salonun en erken açılışı (Genelde Sabah Başlangıç)
                 int salonAcilis = salonConfig.WeekDayMorningStart;
 
-                // Salonun en geç kapanışı (Genelde Akşam Bitiş)
                 int salonKapanis = salonConfig.WeekDayEveningEnd;
 
                 if (trainer.WorkStartHour < salonAcilis)
@@ -100,7 +93,6 @@ namespace SporSalonuYonetimi.Controllers
                 }
             }
 
-            // Services validasyon hatasını temizle (Zorunlu değilse)
             ModelState.Remove("Services");
 
             if (ModelState.IsValid)
@@ -110,7 +102,6 @@ namespace SporSalonuYonetimi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Hata varsa listeyi tekrar yükle
             ViewBag.Services = _context.Services.ToList();
             return View(trainer);
         }
@@ -120,14 +111,14 @@ namespace SporSalonuYonetimi.Controllers
         {
             if (id == null) return NotFound();
 
-            // Antrenörü, mevcut dersleriyle (Services) birlikte çekiyoruz
+            // antrenörü mevcut dersleriyle birlikte çekiyoruz
             var trainer = await _context.Trainers
                 .Include(t => t.Services) // BURASI ÇOK ÖNEMLİ
                 .FirstOrDefaultAsync(m => m.TrainerId == id);
 
             if (trainer == null) return NotFound();
 
-            // Tüm dersleri View'a gönderiyoruz ki checkbox listesi oluşturabilelim
+            // tüm dersleri view'a gönderiyoruz ki checkbox listesi oluşturabilelim
             ViewBag.AllServices = await _context.Services.ToListAsync();
 
             return View(trainer);
@@ -138,20 +129,18 @@ namespace SporSalonuYonetimi.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TrainerId,FullName,Specialization,WorkStartHour,WorkEndHour")] Trainer trainer, int[] selectedServices)
         {
-            // 1. Güvenlik Kontrolü
             if (id != trainer.TrainerId)
             {
                 return NotFound();
             }
 
-            // 2. Salon Saatleri Kontrolü (Senin istediğin özellik)
             var salonConfig = _context.SalonConfigs.FirstOrDefault();
             if (salonConfig != null)
             {
-                // Salonun en erken açılışı (Genelde Sabah Başlangıç)
+                // Salonun en erken açılışı
                 int salonAcilis = salonConfig.WeekDayMorningStart;
 
-                // Salonun en geç kapanışı (Genelde Akşam Bitiş)
+                // Salonun en geç kapanışı
                 int salonKapanis = salonConfig.WeekDayEveningEnd;
 
                 if (trainer.WorkStartHour < salonAcilis)
@@ -165,16 +154,10 @@ namespace SporSalonuYonetimi.Controllers
                 }
             }
 
-            // 3. Geçerlilik Kontrolü
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // --- KRİTİK NOKTA ---
-                    // Formdan gelen 'trainer' nesnesini direkt kaydetmek yerine,
-                    // Veritabanındaki GERÇEK kaydı çekip, onun üzerini yazıyoruz.
-                    // Bu sayede ilişkiler (Services) bozulmaz.
-
                     var trainerToUpdate = await _context.Trainers
                         .Include(t => t.Services) // Mevcut servisleriyle beraber çek
                         .FirstOrDefaultAsync(t => t.TrainerId == id);
@@ -184,14 +167,13 @@ namespace SporSalonuYonetimi.Controllers
                         return NotFound();
                     }
 
-                    // A. Basit Bilgileri Güncelle
+                    // Basit Bilgileri Güncelle
                     trainerToUpdate.FullName = trainer.FullName;
                     trainerToUpdate.Specialization = trainer.Specialization;
                     trainerToUpdate.WorkStartHour = trainer.WorkStartHour;
                     trainerToUpdate.WorkEndHour = trainer.WorkEndHour;
 
-                    // B. Hizmetleri (Dersleri) Güncelle
-                    // Önce eskisini temizle, sonra yenileri ekle
+                    // Hizmetleri Güncelle
                     trainerToUpdate.Services.Clear();
 
                     if (selectedServices != null)
@@ -206,7 +188,7 @@ namespace SporSalonuYonetimi.Controllers
                         }
                     }
 
-                    // C. Kaydet
+                    // Kaydet
                     _context.Update(trainerToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -224,12 +206,9 @@ namespace SporSalonuYonetimi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Hata varsa sayfayı tekrar yükle (Dersleri tekrar seçili getirmek için)
-            // Burası View tarafında Checkboxları doldurmak için gerekli
             var allServices = _context.Services.ToList();
             var trainerServices = trainer.Services?.Select(s => s.ServiceId).ToList() ?? new List<int>();
 
-            // View'a verileri tekrar gönderiyoruz ki ekran boş gelmesin
             ViewData["Services"] = allServices.Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
             {
                 Value = s.ServiceId.ToString(),
@@ -249,7 +228,7 @@ namespace SporSalonuYonetimi.Controllers
             }
 
             var trainer = await _context.Trainers
-                .Include(t => t.Services) // Silmeden önce ne ders verdiğini görelim
+                .Include(t => t.Services) // silmeden önce ne ders verdiğini görelim
                 .FirstOrDefaultAsync(m => m.TrainerId == id);
             if (trainer == null)
             {
@@ -281,10 +260,9 @@ namespace SporSalonuYonetimi.Controllers
 
         // GET: Trainers/List
         // Bu sayfa normal kullanıcıların hocaları vitrin gibi göreceği sayfadır.
-        [AllowAnonymous] // Giriş yapmayanlar da hocaları görebilsin istiyorsan bunu ekle.
+        [AllowAnonymous] // giriş yapmayanlar da hocaları görebilsin
         public async Task<IActionResult> List()
         {
-            // Tüm antrenörleri veritabanından çekip gönderiyoruz
             return View(await _context.Trainers.ToListAsync());
         }
     }

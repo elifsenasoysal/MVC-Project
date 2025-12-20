@@ -26,7 +26,7 @@
                 <tbody>
                     @foreach (var item in Model)
 {
-    // Satır rengi: Reddedilmişse kırmızı, İptalse gri, Onaylıysa yeşil
+    // Reddedilmişse kırmızı, İptalse gri, Onaylıysa yeşil
     string rowClass = "";
     if (item.IsRejected) { rowClass = "table-danger"; }      // Kırmızı
     else if (item.IsCancelled) { rowClass = "table-secondary"; } // Gri
@@ -66,7 +66,7 @@
         <td>
             <div class="btn-group">
                 
-                @if (!item.IsRejected && !item.IsCancelled) // İşlem görmemişse butonları göster
+                @if (!item.IsRejected && !item.IsCancelled)
                 {
                     @if (!item.IsConfirmed)
                     {
