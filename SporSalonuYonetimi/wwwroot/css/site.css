@@ -1,31 +1,96 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+    --primary-color: #0d1b2a; /* O sitedeki Koyu Lacivert */
+    --accent-color: #e63946;  /* Spor salonu için Enerjik Kırmızı */
+    --text-light: #f1faee;
+    --text-dark: #1d3557;
+    --card-bg: #ffffff;
 }
 
 body {
-  margin-bottom: 60px;
+  padding-top: 80px;
+    font-family: 'Poppins', sans-serif; /* Modern Yazı Tipi */
+    background-color: #f8f9fa;
+    color: var(--text-dark);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* --- NAVBAR (ÜST MENÜ) MEKANİĞİ --- */
+.navbar {
+    background-color: var(--primary-color) !important;
+    padding: 15px 0;
+    transition: all 0.3s ease; /* Yumuşak geçiş */
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    font-weight: 500;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important; /* Üstüne gelince renk değişsin */
+}
+
+/* --- HERO SECTION (KAPAK FOTOĞRAFI) --- */
+.hero-section {
+    background: linear-gradient(rgba(13, 27, 42, 0.7), rgba(13, 27, 42, 0.7)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop'); /* Spor Salonu Fotosu */
+    background-size: cover;
+    background-position: center;
+    height: 80vh; /* Ekranın %80'ini kaplasın */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.btn-custom {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 5px; /* Köşeli modern buton */
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #d62828;
+    transform: translateY(-3px); /* Mekanik: Üstüne gelince hafif yukarı zıplar */
+    color: white;
+}
+
+/* --- KARTLAR (FEATURES) --- */
+.feature-card {
+    background: white;
+    padding: 40px 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Hafif modern gölge */
+    transition: transform 0.3s;
+    height: 100%;
+    border-bottom: 3px solid transparent;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px); /* O sitedeki gibi yukarı kalkma efekti */
+    border-bottom: 3px solid var(--accent-color);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
 }

@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "AI Koç";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-robot"></i> Yapay Zeka Koçum</h4>
+                </div>
+                <div class="card-body">
+                    <form id="aiForm" asp-action="GeneratePlan" method="post" enctype="multipart/form-data">
+                        
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label>Cinsiyet</label>
+                                <select name="gender" class="form-select">
+                                    <option value="Erkek">Erkek</option>
+                                    <option value="Kadın">Kadın</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label>Yaş</label>
+                                <input type="number" name="age" class="form-control" value="@ViewBag.Age" placeholder="25" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label>Kilo (kg)</label>
+                                <input type="number" name="weight" class="form-control" value="@ViewBag.Weight" placeholder="75" required />
+                            </div>
+                            <div class="col">
+                                <label>Boy (cm)</label>
+                                <input type="number" name="height" class="form-control" value="@ViewBag.Height" placeholder="180" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold text-primary">
+                                <i class="bi bi-camera"></i> Fotoğraf Yükle (İsteğe Bağlı)
+                            </label>
+                            <input type="file" name="userImage" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Hedefin Ne?</label>
+                            <textarea name="goal" class="form-control" rows="3" placeholder="Örn: Göbek eritmek ve kas yapmak istiyorum." required>@ViewBag.Goal</textarea>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-success w-100 py-2">
+                            <i class="bi bi-magic"></i> Analiz Et
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            @if (ViewBag.Plan != null)
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Senin İçin Hazırladığım Plan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="white-space: pre-wrap;">@ViewBag.Plan</div>
+                    </div>
+                </div>
+
+                @if (ViewBag.ImageUrl != null)
+                {
+                    <div class="card shadow">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Hedeflenen Görünüm</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="@ViewBag.ImageUrl" class="img-fluid rounded" style="max-height: 500px;" />
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Bilgilerini gir, fotoğrafını yükle (istersen) ve yapay zekanın senin için çalışmasını izle!
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('aiForm').addEventListener('submit', function(e) {
+        
+        // 1. Önce form geçerli mi (dolu mu) kontrol et
+        if (!this.checkValidity()) {
+            // Eğer boş alan varsa bırak tarayıcı uyarı versin, hiçbir şey yapma
+            return;
+        }
+
+        // 2. Her şey doluysa butonu kilitle ve döndür
+        var btn = document.getElementById('submitBtn');
+        var originalText = btn.innerHTML;
+        
+        btn.disabled = true; // Çift tıklamayı önle
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Yapay Zeka Düşünüyor...';
+        
+        // Not: Form submit işlemi devam eder, backend'e gider.
+    });
+</script>

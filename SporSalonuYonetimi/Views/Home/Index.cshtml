@@ -4,8 +4,63 @@
     ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center mb-5">
-    <h1 class="display-4 fw-bold text-primary">Sağlıklı Yaşama Hoş Geldiniz</h1>
-    <p class="lead text-muted">Uzman antrenörlerimizle hedeflerinize ulaşın.</p>
+<div class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">SINIRLARINI ZORLA</h1>
+        <p class="lead mb-4">En iyi eğitmenler ve yapay zeka desteği ile potansiyelini açığa çıkar.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a asp-controller="Trainers" asp-action="Index" class="btn btn-custom">
+                Eğitmenleri Keşfet
+            </a>
+            <a asp-controller="AI" asp-action="Index" class="btn btn-outline-light px-4 py-2" style="border-width: 2px; font-weight:600;">
+                <i class="bi bi-robot"></i> AI Koç'u Dene
+            </a>
+        </div>
+    </div>
 </div>
 
+<div class="container py-5" style="margin-top: -50px; position: relative; z-index: 2;">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="fa-solid fa-calendar-check feature-icon"></i>
+                <h4>Kolay Randevu</h4>
+                <p class="text-muted">İstediğin antrenörden saniyeler içinde randevu al, zamanını yönet.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="fa-solid fa-brain feature-icon"></i>
+                <h4>Yapay Zeka Destekli</h4>
+                <p class="text-muted">AI Koç vücut tipini analiz eder ve sana en uygun programı çıkarır.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="fa-solid fa-dumbbell feature-icon"></i>
+                <h4>Modern Ekipmanlar</h4>
+                <p class="text-muted">Son teknoloji ekipmanlar ve hijyenik salonumuzda sporun tadını çıkar.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark mb-4">Neden Biz?</h2>
+            <p class="text-muted">
+                Spor salonumuz sadece ağırlık kaldırmak için değil, bir yaşam tarzı oluşturmak için tasarlandı. 
+                Uzman kadromuz ve teknolojik altyapımızla (Yapay Zeka Entegrasyonu) diğerlerinden farklıyız.
+            </p>
+            <ul class="list-unstyled mt-4">
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Kişiye Özel Programlar</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> 7/24 Açık Salon</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Mobil Takip Sistemi</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1375&auto=format&fit=crop" class="img-fluid rounded shadow" alt="Gym Interior">
+        </div>
+    </div>
+</div>
