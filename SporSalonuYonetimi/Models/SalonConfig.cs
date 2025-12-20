@@ -1,19 +1,38 @@
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SporSalonuYonetimi.Models
 {
     public class SalonConfig
     {
-        [Key]
-        public int Id { get; set; } // Genelde hep ID=1 olan tek kayıt duracak
+        public int Id { get; set; }
 
-        [Display(Name = "Salon Açılış Saati")]
-        public int OpenHour { get; set; } = 8; 
+        // --- HAFTA İÇİ AYARLARI ---
+        public int WeekDayMorningStart { get; set; } = 5;
+        public int WeekDayMorningEnd { get; set; } = 9;
+        public int WeekDayEveningStart { get; set; } = 17;
+        public int WeekDayEveningEnd { get; set; } = 22;
 
-        [Display(Name = "Salon Kapanış Saati")]
-        public int CloseHour { get; set; } = 22;
+        // --- HAFTA SONU AYARLARI (Cumartesi ve Pazar için Ortak) ---
+        // İsimleri 'Saturday' yerine 'Weekend' yaptık
+        public int WeekendMorningStart { get; set; } = 5;
+        public int WeekendMorningEnd { get; set; } = 9;
 
-        [Display(Name = "Hafta Sonu Açık mı?")]
-        public bool IsWeekendOpen { get; set; } = true;
+        public int WeekendEveningStart { get; set; } = 17;
+        public int WeekendEveningEnd { get; set; } = 20;
+
+        // --- PAZAR GÜNÜ KONTROLÜ ---
+        // True ise hafta sonu saatlerini uygular, False ise kapalıdır.
+        public bool IsSundayOpen { get; set; } = false;
+
+        // --- GÖRÜNÜM İÇİN OTOMATİK METİNLER ---
+        [NotMapped]
+        public string WeekDayMorningText => $"{WeekDayMorningStart:00}:00 - {WeekDayMorningEnd:00}:00";
+        [NotMapped]
+        public string WeekDayEveningText => $"{WeekDayEveningStart:00}:00 - {WeekDayEveningEnd:00}:00";
+
+        [NotMapped]
+        public string WeekendMorningText => $"{WeekendMorningStart:00}:00 - {WeekendMorningEnd:00}:00";
+        [NotMapped]
+        public string WeekendEveningText => $"{WeekendEveningStart:00}:00 - {WeekendEveningEnd:00}:00";
     }
 }

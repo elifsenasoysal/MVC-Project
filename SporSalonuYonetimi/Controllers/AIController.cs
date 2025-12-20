@@ -8,7 +8,7 @@ namespace SporSalonuYonetimi.Controllers
     public class AIController : Controller
     {
         // Google API Key'in burada kalacak
-        private readonly string _geminiApiKey = "AIzaSyD_bqbI_qW4RnDngBQ9MHF5MgXAnqu_Rxw";
+        private readonly string _geminiApiKey = "YOUR_GOOGLE_GEMINI_API_KEY";
 
         [HttpGet]
         public IActionResult Index()
@@ -26,7 +26,7 @@ namespace SporSalonuYonetimi.Controllers
 
             // 2. METİN VE ANALİZ OLUŞTURMA (Google Gemini - Vision)
             string planText = "Analiz yapılamadı.";
-            
+
             // Kullanıcı resim yükledi mi kontrolü
             string base64Image = "";
             string mimeType = "";
@@ -53,7 +53,7 @@ namespace SporSalonuYonetimi.Controllers
 
                     // A) Metin Sorusu
                     string promptText = $"Ben {age} yaşında, {weight} kilo, {height} cm boyunda bir {gender} bireyim. Hedefim: {goal}. ";
-                    
+
                     if (!string.IsNullOrEmpty(base64Image))
                     {
                         promptText += "Eklediğim fotoğraftaki vücut tipini analiz et ve buna göre bana kişisel bir diyet ve egzersiz programı hazırla.";
@@ -62,7 +62,7 @@ namespace SporSalonuYonetimi.Controllers
                     {
                         promptText += "Bana uygun diyet ve egzersiz programı hazırla.";
                     }
-                    
+
                     promptText += " Cevabı Türkçe ver, samimi bir koç gibi konuş ve listele.";
 
                     partsList.Add(new { text = promptText });
@@ -70,13 +70,13 @@ namespace SporSalonuYonetimi.Controllers
                     // B) Resim (Varsa ekle)
                     if (!string.IsNullOrEmpty(base64Image))
                     {
-                        partsList.Add(new 
-                        { 
-                            inline_data = new 
-                            { 
-                                mime_type = mimeType, 
-                                data = base64Image 
-                            } 
+                        partsList.Add(new
+                        {
+                            inline_data = new
+                            {
+                                mime_type = mimeType,
+                                data = base64Image
+                            }
                         });
                     }
 
@@ -92,7 +92,7 @@ namespace SporSalonuYonetimi.Controllers
                     var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
                     var response = await client.PostAsync(apiUrl, content);
-                    
+
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
@@ -112,7 +112,7 @@ namespace SporSalonuYonetimi.Controllers
 
             ViewBag.Plan = planText;
             ViewBag.ImageUrl = generatedImageUrl;
-            
+
             // Form verilerini geri doldur
             ViewBag.Age = age;
             ViewBag.Weight = weight;

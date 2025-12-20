@@ -1,44 +1,72 @@
 @model SporSalonuYonetimi.Models.Trainer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Antrenör Detayları";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-<div>
-    <h4>Trainer</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Specialization)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Specialization)
-        </dd>
-        <dt class="col-sm-2">
-            Uzmanlık Alanı
-        </dt>
-        <dd class="col-sm-10">
-            @Model.Specialization
-        </dd>
+            <div class="card shadow">
+                <div class="card-header bg-info text-white" >
+                    <h4>👤 Antrenör Detayları</h4>
+                </div>
 
-        <dt class="col-sm-2">
-            Çalışma Saatleri
-        </dt>
-        <dd class="col-sm-10">
-            @Model.WorkStartHour:00 - @Model.WorkEndHour:00
-        </dd>
-    </dl>
+                <div class="card-body">
 
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TrainerId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 fw-bold">Ad Soyad</dt>
+                        <dd class="col-sm-8">@Model.FullName</dd>
+
+                        <dt class="col-sm-4 fw-bold">Uzmanlık Alanı</dt>
+                        <dd class="col-sm-8">@Model.Specialization</dd>
+
+                        <dt class="col-sm-4 fw-bold">Çalışma Saatleri</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-clock"></i>
+                                @Model.WorkStartHour:00 - @Model.WorkEndHour:00
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4 fw-bold">Verebildiği Dersler</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Services != null && Model.Services.Any())
+                            {
+                                @foreach (var service in Model.Services)
+                                {
+                                    <span class="badge bg-primary me-1">
+                                        @service.ServiceName
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    Ders atanmadı
+                                </span>
+                            }
+                        </dd>
+                    </dl>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Edit"
+                           asp-route-id="@Model.TrainerId"
+                           class="btn btn-warning">
+                            Düzenle
+                        </a>
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary">
+                            Listeye Dön
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

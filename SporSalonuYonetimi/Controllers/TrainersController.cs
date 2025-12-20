@@ -69,19 +69,22 @@ namespace SporSalonuYonetimi.Controllers
         {
             // Salon Ayarlarını Çek
             var salonConfig = _context.SalonConfigs.FirstOrDefault();
-
             if (salonConfig != null)
             {
-                // 1. Başlangıç Saati Kontrolü
-                if (trainer.WorkStartHour < salonConfig.OpenHour)
+                // Salonun en erken açılışı (Genelde Sabah Başlangıç)
+                int salonAcilis = salonConfig.WeekDayMorningStart;
+
+                // Salonun en geç kapanışı (Genelde Akşam Bitiş)
+                int salonKapanis = salonConfig.WeekDayEveningEnd;
+
+                if (trainer.WorkStartHour < salonAcilis)
                 {
-                    ModelState.AddModelError("WorkStartHour", $"Antrenör, salon açılış saatinden ({salonConfig.OpenHour}:00) önce işe başlayamaz!");
+                    ModelState.AddModelError("WorkStartHour", $"Antrenör mesaisi salon açılışından ({salonAcilis}:00) önce başlayamaz.");
                 }
 
-                // 2. Bitiş Saati Kontrolü
-                if (trainer.WorkEndHour > salonConfig.CloseHour)
+                if (trainer.WorkEndHour > salonKapanis)
                 {
-                    ModelState.AddModelError("WorkEndHour", $"Antrenör, salon kapanış saatinden ({salonConfig.CloseHour}:00) sonra çalışamaz!");
+                    ModelState.AddModelError("WorkEndHour", $"Antrenör mesaisi salon kapanışından ({salonKapanis}:00) sonra bitemez.");
                 }
             }
             // Gelen Hizmet ID'lerini antrenöre ekle
@@ -145,13 +148,20 @@ namespace SporSalonuYonetimi.Controllers
             var salonConfig = _context.SalonConfigs.FirstOrDefault();
             if (salonConfig != null)
             {
-                if (trainer.WorkStartHour < salonConfig.OpenHour)
+                // Salonun en erken açılışı (Genelde Sabah Başlangıç)
+                int salonAcilis = salonConfig.WeekDayMorningStart;
+
+                // Salonun en geç kapanışı (Genelde Akşam Bitiş)
+                int salonKapanis = salonConfig.WeekDayEveningEnd;
+
+                if (trainer.WorkStartHour < salonAcilis)
                 {
-                    ModelState.AddModelError("WorkStartHour", $"Antrenör, salon açılış saatinden ({salonConfig.OpenHour}:00) önce işe başlayamaz!");
+                    ModelState.AddModelError("WorkStartHour", $"Antrenör mesaisi salon açılışından ({salonAcilis}:00) önce başlayamaz.");
                 }
-                if (trainer.WorkEndHour > salonConfig.CloseHour)
+
+                if (trainer.WorkEndHour > salonKapanis)
                 {
-                    ModelState.AddModelError("WorkEndHour", $"Antrenör, salon kapanış saatinden ({salonConfig.CloseHour}:00) sonra çalışamaz!");
+                    ModelState.AddModelError("WorkEndHour", $"Antrenör mesaisi salon kapanışından ({salonKapanis}:00) sonra bitemez.");
                 }
             }
 
@@ -267,6 +277,15 @@ namespace SporSalonuYonetimi.Controllers
         private bool TrainerExists(int id)
         {
             return _context.Trainers.Any(e => e.TrainerId == id);
+        }
+
+        // GET: Trainers/List
+        // Bu sayfa normal kullanıcıların hocaları vitrin gibi göreceği sayfadır.
+        [AllowAnonymous] // Giriş yapmayanlar da hocaları görebilsin istiyorsan bunu ekle.
+        public async Task<IActionResult> List()
+        {
+            // Tüm antrenörleri veritabanından çekip gönderiyoruz
+            return View(await _context.Trainers.ToListAsync());
         }
     }
 }

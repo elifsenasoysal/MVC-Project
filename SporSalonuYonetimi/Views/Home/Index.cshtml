@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SporSalonuYonetimi.Models.Service>
+﻿@model SporSalonuYonetimi.Models.SalonConfig
 
 @{
     ViewData["Title"] = "Ana Sayfa";
@@ -9,11 +9,12 @@
         <h1 class="hero-title">SINIRLARINI ZORLA</h1>
         <p class="lead mb-4">En iyi eğitmenler ve yapay zeka desteği ile potansiyelini açığa çıkar.</p>
         <div class="d-flex justify-content-center gap-3">
-            <a asp-controller="Trainers" asp-action="Index" class="btn btn-custom">
+            <a asp-controller="Trainers" asp-action="List" class="btn btn-custom">
                 Eğitmenleri Keşfet
             </a>
-            <a asp-controller="AI" asp-action="Index" class="btn btn-outline-light px-4 py-2" style="border-width: 2px; font-weight:600;">
-                <i class="bi bi-robot"></i> AI Koç'u Dene
+            <a asp-controller="AI" asp-action="Index" class="btn btn-outline-light px-4 py-2"
+                style="border-width: 2px; font-weight:600;">
+                <i class="fa-solid fa-robot"></i> AI Koç'u Dene
             </a>
         </div>
     </div>
@@ -45,12 +46,69 @@
     </div>
 </div>
 
+<div class="container-fluid p-0 my-5">
+    <div class="row g-0 align-items-stretch">
+
+        <div class="col-lg-4 col-md-12">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop"
+                class="img-fluid h-100 w-100 object-fit-cover" style="min-height: 400px;" alt="Gym 1">
+        </div>
+
+        <div class="col-lg-4 col-md-12 text-white text-center d-flex flex-column justify-content-center p-5"
+            style="background-color: #0d1b2a;">
+
+            <div class="mb-4">
+                <i class="fa-regular fa-calendar-days fa-3x mb-3"></i>
+                <h2 class="fw-bold" style="letter-spacing: 2px;">AÇILIŞ SAATLERİ</h2>
+                <div class="d-flex justify-content-center align-items-center my-2">
+                    <span style="border-top: 2px dotted white; width: 40px;"></span>
+                    <i class="fa-solid fa-dumbbell mx-2"></i>
+                    <span style="border-top: 2px dotted white; width: 40px;"></span>
+                </div>
+            </div>
+
+            <div>
+                <p class="fs-5 mb-1 fw-bold">Hafta İçi</p>
+                <p class="fw-light mb-4">
+                    Sabah: @Model.WeekDayMorningText <br>
+                    Akşam: @Model.WeekDayEveningText
+                </p>
+
+                <p class="fs-5 mb-1 fw-bold">Hafta Sonu</p>
+                <p class="fw-light mb-2">
+                    Sabah: @Model.WeekendMorningText <br>
+                    Akşam: @Model.WeekendEveningText
+                </p>
+
+                @if (!Model.IsSundayOpen)
+                {
+                    <div class="badge bg-danger text-wrap mt-2 p-2">
+                        <i class="fa-solid fa-circle-info"></i> Pazar Kapalı
+                    </div>
+                }
+                else
+                {
+                    <div class="badge bg-success text-wrap mt-2 p-2">
+                        <i class="fa-solid fa-check"></i> Pazar Açık
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop"
+                class="img-fluid h-100 w-100 object-fit-cover" style="min-height: 400px;" alt="Gym 2">
+        </div>
+
+    </div>
+</div>
+
 <div class="container py-5">
     <div class="row align-items-center">
         <div class="col-md-6">
             <h2 class="fw-bold text-dark mb-4">Neden Biz?</h2>
             <p class="text-muted">
-                Spor salonumuz sadece ağırlık kaldırmak için değil, bir yaşam tarzı oluşturmak için tasarlandı. 
+                Spor salonumuz sadece ağırlık kaldırmak için değil, bir yaşam tarzı oluşturmak için tasarlandı.
                 Uzman kadromuz ve teknolojik altyapımızla (Yapay Zeka Entegrasyonu) diğerlerinden farklıyız.
             </p>
             <ul class="list-unstyled mt-4">
@@ -60,7 +118,8 @@
             </ul>
         </div>
         <div class="col-md-6">
-            <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1375&auto=format&fit=crop" class="img-fluid rounded shadow" alt="Gym Interior">
+            <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1375&auto=format&fit=crop"
+                class="img-fluid rounded shadow" alt="Gym Interior">
         </div>
     </div>
 </div>

@@ -20,11 +20,23 @@ public class HomeController : Controller
         _context = context; // Bağlantıyı içeri aldık
     }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
-        return View();
-    }
+        // Layout'ta tam ekran görünmesi için
+        ViewData["TamEkran"] = true;
 
+        // Veritabanından Salon Ayarlarını çekiyoruz
+        var config = _context.SalonConfigs.FirstOrDefault();
+
+        // Eğer veritabanı boşsa hata vermesin diye varsayılan oluşturuyoruz
+        if (config == null)
+        {
+            config = new SalonConfig();
+        }
+
+        // Sayfaya bu ayarları gönderiyoruz
+        return View(config);
+    }
     public IActionResult Privacy()
     {
         return View();

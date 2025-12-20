@@ -1,0 +1,91 @@
+@model IEnumerable<SporSalonuYonetimi.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Eğitmenlerimiz";
+
+    // RASTGELE RESİM LİSTESİ
+    var placeholders = new List<string>
+    {
+        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&auto=format&fit=crop"
+    };
+}
+
+<div class="container mt-5 mb-5 text-center">
+    <h2 class="fw-bold display-5" style="color: #0d1b2a; letter-spacing: 1px;">UZMAN KADROMUZ</h2>
+    <p class="text-muted lead mx-auto" style="max-width: 600px;">
+        Hedeflerine ulaşmanda sana rehberlik edecek profesyonel eğitmenlerimizle tanış.
+    </p>
+    <div style="width: 80px; height: 4px; background-color: #e63946; margin: 20px auto; border-radius: 2px;"></div>
+</div>
+
+<div class="container mb-5">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow border-0 overflow-hidden trainer-card">
+                    
+                    <div class="card-img-top position-relative" style="height: 260px; background-color: #e9ecef;">
+                        @if (item.Image != null && item.Image.Length > 0)
+                        {
+                            var base64 = Convert.ToBase64String(item.Image);
+                            var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                            
+                            <img src="@imgSrc" class="w-100 h-100 object-fit-cover" alt="@item.FullName" />
+                        }
+                        else
+                        {
+                            int index = item.TrainerId % placeholders.Count;
+                            string randomImg = placeholders[index];
+                            
+                            <img src="@randomImg" class="w-100 h-100 object-fit-cover" alt="Gym Placeholder" />
+                            
+                            <div class="position-absolute top-0 start-0 m-2 badge bg-primary text-uppercase" 
+                                 style="font-size: 0.7rem; background-color: #0d1b2a !important; opacity: 0.9;">
+                                Profesyonel Eğitmen
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card-body text-center d-flex flex-column" style="background-color: #fff;">
+                        
+                        <h4 class="card-title fw-bold mb-1" style="color: #0d1b2a;">@item.FullName</h4>
+                        
+                        <span class="badge rounded-pill bg-danger px-3 mb-3 mx-auto" 
+                              style="font-weight: 500; font-size: 0.85rem; background-color: #e63946 !important;">
+                            @item.Specialization
+                        </span>
+                        
+                        <div class="d-flex justify-content-center gap-4 mb-4 text-muted small mt-auto pt-3 border-top">
+                            <div title="Deneyim" class="d-flex align-items-center">
+                                <i class="fa-solid fa-certificate text-warning me-2 fa-lg"></i>
+                                <span>Sertifikalı</span>
+                            </div>
+                            <div title="Mesai Saatleri" class="d-flex align-items-center">
+                                <i class="fa-regular fa-clock me-2 fa-lg" style="color: #0d1b2a;"></i>
+                                <span>@item.WorkStartHour:00 - @item.WorkEndHour:00</span>
+                            </div>
+                        </div>
+
+                        <a asp-controller="Appointment" asp-action="BookingPanel" 
+                           class="btn btn-lg w-100 fw-bold text-white stretched-link" 
+                           style="background-color: #0d1b2a; border-radius: 8px; transition: all 0.3s;">
+                            Randevu Al
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .trainer-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .trainer-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.2) !important; }
+    .trainer-card .btn:hover { background-color: #e63946 !important; transform: scale(1.02); }
+    .object-fit-cover { object-fit: cover; }
+</style>
